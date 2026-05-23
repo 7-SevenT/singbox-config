@@ -34,6 +34,30 @@ config.outbounds.forEach(outbound => {
   }
 });
 
+
+function sanitize(obj) {
+  if (typeof obj === 'string') {
+    return obj.replace(/[\x00-\x1F]/g, '')
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sanitize)
+  }
+  if (obj && typeof obj === 'object') {
+    for (let k in obj) {
+      obj[k] = sanitize(obj[k])
+    }
+  }
+  return obj
+}
+config = sanitize(config)
+
+
+$content = JSON.stringify(config, null, 2)
+
+function getTags(proxies, regex) {
+  return (regex ? proxies.filter(p => regex.test(p.tag)) : proxies).map(p => p.tag)
+}
+
 $content = JSON.stringify(config, null, 2)
 
 function getTags(proxies, regex) {
