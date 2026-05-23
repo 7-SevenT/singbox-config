@@ -79,8 +79,7 @@
         "🚀 PROXY"
       ],
       "interrupt_exist_connections": true
-    },
-    //全部节点配置
+    }
   ],
   "dns": {
     "servers": [
