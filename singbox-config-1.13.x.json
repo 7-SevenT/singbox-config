@@ -46,8 +46,7 @@
       "type": "selector",
       "tag": "🚀 PROXY",
       "outbounds": [
-        "⚡ AUTO",
-        //全部节点tag
+        "⚡ AUTO"
       ],
       "default": "⚡ AUTO",
       "interrupt_exist_connections": true
@@ -55,9 +54,7 @@
     {
       "type": "urltest",
       "tag": "⚡ AUTO",
-      "outbounds": [
-        //全部节点tag
-      ],
+      "outbounds": [],
       "url": "https://www.gstatic.com/generate_204",
       "interval": "3m",
       "tolerance": 150,
@@ -67,9 +64,7 @@
     {
       "type": "urltest",
       "tag": "🪙 CRYPTO",
-      "outbounds": [
-        // 澳门 日本 台湾 韩国 等
-      ],
+      "outbounds": [],
       "url": "https://api.binance.com/api/v3/ping",
       "interval": "3m",
       "tolerance": 150,
