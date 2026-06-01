@@ -62,13 +62,12 @@
       "interrupt_exist_connections": true
     },
     {
-      "type": "urltest",
+      "type": "selector",
       "tag": "🪙 CRYPTO",
-      "outbounds": [],
-      "url": "https://api.binance.com/api/v3/ping",
-      "interval": "3m",
-      "tolerance": 150,
-      "idle_timeout": "30m",
+      "outbounds": [
+        "🚀 PROXY"
+      ],
+      "default": "🚀 PROXY",
       "interrupt_exist_connections": true
     },
     {
