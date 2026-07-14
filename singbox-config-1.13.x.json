@@ -294,7 +294,8 @@
         "rules": [{
           "domain_suffix": [
             "remixicon.com",
-            "emojipedia.org"
+            "emojipedia.org",
+            "sevent.cloud"
           ],
           "process_name": [
             
