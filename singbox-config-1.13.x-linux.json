@@ -1,0 +1,324 @@
+{
+  "log": {
+    "disabled": false,
+    "level": "error",
+    "timestamp": false
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "cache.db",
+      "store_fakeip": true
+    },
+    "clash_api": {
+      "external_controller": "0.0.0.0:9090",
+      "external_ui": "/etc/sing-box/ui",
+      "external_ui_download_url": "https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip",
+      "external_ui_download_detour": "🚀 PROXY",
+      "default_mode": "rule"
+    }
+  },
+  "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "interface_name": "sing-box",
+      "address": ["172.19.0.1/30"],
+      "mtu": 0,
+      "auto_route": true,
+      "strict_route": true,
+      "endpoint_independent_nat": false,
+      "stack": "mixed"
+    },
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "0.0.0.0",
+      "listen_port": 7890
+    }
+  ],
+  "outbounds":[
+    {
+      "type": "direct",
+      "tag": "🎯 DIRECT"
+    },
+    {
+      "type": "selector",
+      "tag": "🚀 PROXY",
+      "outbounds": [
+        "⚡ AUTO"
+      ],
+      "default": "⚡ AUTO",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "urltest",
+      "tag": "⚡ AUTO",
+      "outbounds": [],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "idle_timeout": "30m",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "🪙 CRYPTO",
+      "outbounds": [
+        "🚀 PROXY"
+      ],
+      "default": "🚀 PROXY",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "🐋 FALLBACK",
+      "outbounds": [
+        "🎯 DIRECT",
+        "🚀 PROXY"
+      ],
+      "interrupt_exist_connections": true
+    }
+  ],
+  "dns": {
+    "servers": [
+      {
+        "tag": "System-DNS",
+        "type" : "local"
+      },
+      {
+        "tag": "Ali-DNS",
+        "type": "udp",
+        "server_port": 53,
+        "server": "223.5.5.5"
+      },
+      {
+        "tag": "Remote-DNS",
+        "type": "https",
+        "domain_resolver": "System-DNS",
+        "server_port": 443,
+        "server": "8.8.8.8",
+        "detour": "🚀 PROXY"
+      },
+      {
+        "tag": "Fake-IP",
+        "type": "fakeip",
+        "inet4_range": "198.18.0.0/15"
+      }
+    ],
+    "rules": [
+      {
+        "action": "reject",
+        "rule_set": [
+          "Category-Ads"
+        ]
+      },
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "server": "System-DNS"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "server": "Remote-DNS"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-CN",
+          "GeoSite-Crypto",
+          "CryptoSite",
+          "GeoLocation-!CN",
+          "CustomSite",
+          "GeoSite-Telegram"
+        ],
+        "server": "Fake-IP"
+      }
+    ],
+    "strategy": "ipv4_only",
+    "client_subnet": "223.72.0.1",
+    "final": "Remote-DNS"
+  },
+  "route": {
+    "default_domain_resolver": "System-DNS",
+    "rules": [
+      {
+        "action": "sniff",
+        "inbound": "tun-in"
+      },
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "protocol": "dns"
+          },
+          {
+            "port": 53
+          }
+        ],
+        "action": "hijack-dns"
+      },
+      {
+        "action": "route",
+        "ip_is_private": true,
+        "outbound": "🎯 DIRECT"
+      },
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "outbound": "🎯 DIRECT"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "outbound": "🚀 PROXY"
+      },
+      {
+        "action": "route",
+        "network": "icmp",
+        "outbound": "🎯 DIRECT"
+      },
+      {
+        "action": "reject",
+        "protocol": "quic"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-CN",
+          "CustomSite-CN"
+        ],
+        "outbound": "🎯 DIRECT"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoSite-Crypto",
+          "CryptoSite"
+        ],
+        "outbound": "🪙 CRYPTO"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoLocation-!CN",
+          "CustomSite",
+          "GeoSite-Telegram"
+        ],
+        "outbound": "🚀 PROXY"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoIP-CN"
+        ],
+        "outbound": "🎯 DIRECT"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "GeoIP-Telegram"
+        ],
+        "outbound": "🚀 PROXY"
+      }
+    ],
+    "rule_set": [
+      {
+        "tag": "Category-Ads",
+        "type": "remote",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "format": "binary",
+        "download_detour": "🎯 DIRECT"
+      },
+      {
+        "tag": "GeoIP-CN",
+        "type": "remote",
+        "url": "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/srs/cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 DIRECT"
+      },
+      {
+        "tag": "GeoSite-CN",
+        "type": "remote",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 DIRECT"
+      },
+      {
+        "tag": "GeoSite-Crypto",
+        "type": "remote",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-cryptocurrency.srs",
+        "format": "binary",
+        "download_detour": "🎯 DIRECT"
+      },
+      {
+        "tag": "GeoLocation-!CN",
+        "type": "remote",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
+        "format": "binary",
+        "download_detour": "🎯 DIRECT"
+      },
+      {
+        "tag": "GeoSite-Telegram",
+        "type": "remote",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/telegram.srs",
+        "format": "binary",
+        "download_detour": "🎯 DIRECT"
+      },
+      {
+        "tag": "GeoIP-Telegram",
+        "type": "remote",
+        "url": "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/telegram.srs",
+        "format": "binary",
+        "download_detour": "🎯 DIRECT"
+      },
+      {
+        "tag": "CryptoSite",
+        "type": "inline",
+        "rules": [{
+          "domain_suffix": [
+            "hyperliquid.xyz",
+            "bgbstatic.com",
+            "bgstatic.com",
+            "atas.net"
+          ],
+          "process_name": [
+            "OFT.Platform.exe"
+          ]
+        }]
+      },
+      {
+        "tag": "CustomSite",
+        "type": "inline",
+        "rules": [{
+          "domain_suffix": [
+            "remixicon.com",
+            "emojipedia.org",
+            "sevent.cloud"
+          ],
+          "process_name": [
+            
+          ]
+        }]
+      },
+      {
+        "tag": "CustomSite-CN",
+        "type": "inline",
+        "rules": [
+          {
+            "domain_suffix": [
+              "argotunnel.com"
+            ],
+            "domain": [
+              "api.cloudflare.com"
+            ]
+          }
+        ]
+      }
+    ],
+    "auto_detect_interface": true,
+    "final": "🐋 FALLBACK"
+  }
+}
