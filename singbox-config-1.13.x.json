@@ -284,7 +284,8 @@
             "atas.net"
           ],
           "process_name": [
-            "OFT.Platform.exe"
+            "OFT.Platform.exe",
+            "FTNN.exe"
           ]
         }]
       },
