@@ -6,8 +6,7 @@
   },
   "http_clients": [
     {
-      "tag": "direct-http",
-      "detour": "🎯 DIRECT"
+      "tag": "direct-http"
     }
   ],
   "experimental": {
