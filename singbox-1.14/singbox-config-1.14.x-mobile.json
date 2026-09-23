@@ -1,7 +1,7 @@
 {
   "log": {
     "disabled": false,
-    "level": "error",
+    "level": "debug",
     "timestamp": false
   },
   "experimental": {
@@ -21,7 +21,7 @@
     {
       "type": "tun",
       "tag": "tun-in",
-      "address": ["172.19.0.1/30"],
+      "address": ["172.19.0.1/30", "fdfe:dcba:9876::1/126"],
       "auto_route": true
     },
     {
@@ -81,9 +81,15 @@
         "type": "local"
       },
       {
+        "tag": "Ali-DNS",
+        "type": "udp",
+        "server_port": 53,
+        "server": "223.5.5.5"
+      },
+      {
         "tag": "Remote-DNS",
         "type": "https",
-        "domain_resolver": "System-DNS",
+        "domain_resolver": "Ali-DNS",
         "server_port": 443,
         "server": "8.8.8.8",
         "detour": "🚀 PROXY"
@@ -129,7 +135,7 @@
     "final": "Remote-DNS"
   },
   "route": {
-    "default_domain_resolver": "System-DNS",
+    "default_domain_resolver": "Ali-DNS",
     "default_http_client": "rule-set-http",
     "rules": [
       {
