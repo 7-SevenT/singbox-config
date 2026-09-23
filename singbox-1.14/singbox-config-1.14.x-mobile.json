@@ -14,8 +14,7 @@
   "http_clients": [
     {
       "tag": "rule-set-http",
-      "version": 2,
-      "detour": "🎯 DIRECT"
+      "version": 2
     }
   ],
   "inbounds": [

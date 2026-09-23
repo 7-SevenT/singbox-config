@@ -21,10 +21,7 @@
   "http_clients": [
     {
       "tag": "rule-set-http",
-      "version": 2,
-      "detour": "🎯 DIRECT",
-      "stream_receive_window": 0,
-      "connection_receive_window": 0
+      "version": 2
     }
   ],
   "inbounds": [
